@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "345315916398",
+    "firebase_url": "https://tictactoe9-3d4d7.firebaseio.com",
+    "project_id": "tictactoe9-3d4d7",
+    "storage_bucket": "tictactoe9-3d4d7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:345315916398:android:52c0cc5712fe7267",
+        "android_client_info": {
+          "package_name": "com.kutapps.tictactoe9"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "345315916398-j7he85ofjt8qonpo715qco972j5i06ks.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHyG3k6tc83Vx6dGgwmRK8U9ikO4EH_eY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "345315916398-j7he85ofjt8qonpo715qco972j5i06ks.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
