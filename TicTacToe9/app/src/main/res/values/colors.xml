@@ -3,4 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="field_background">#22000000</color>
+    <color name="winner_overlay">#88000000</color>
+    <color name="inactive_overlay">#33000000</color>
 </resources>

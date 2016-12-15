@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:bind="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="model"
+            type="SingleBoardViewModel"/>
+
+        <variable
+            name="board"
+            type="java.lang.Integer"/>
+
+        <variable
+            name="availableInNextMove"
+            type="java.lang.Boolean"/>
+
+        <variable
+            name="handler"
+            type="com.kutapps.tictactoe9.board.fragments.handlers.FieldHandler"/>
+
+        <import type="com.kutapps.tictactoe9.board.consts.WinnerType"/>
+
+        <import type="com.kutapps.tictactoe9.board.viewmodels.SingleBoardViewModel"/>
+    </data>
+
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            layout="@layout/view_field"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_aspectRatio="100%"
+            app:layout_marginPercent="1%"
+            app:layout_widthPercent="32%"
+            bind:board="@{board}"
+            bind:field="@{0}"
+            bind:handler="@{handler}"
+            bind:model="@{model.fields[0]}"/>
+
+        <include
+            layout="@layout/view_field"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerHorizontal="true"
+            app:layout_aspectRatio="100%"
+            app:layout_marginPercent="1%"
+            app:layout_widthPercent="32%"
+            bind:board="@{board}"
+            bind:field="@{1}"
+            bind:handler="@{handler}"
+            bind:model="@{model.fields[1]}"/>
+
+        <include
+            layout="@layout/view_field"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentEnd="true"
+            app:layout_aspectRatio="100%"
+            app:layout_marginPercent="1%"
+            app:layout_widthPercent="32%"
+            bind:board="@{board}"
+            bind:field="@{2}"
+            bind:handler="@{handler}"
+            bind:model="@{model.fields[2]}"/>
+
+        <include
+            layout="@layout/view_field"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerVertical="true"
+            app:layout_aspectRatio="100%"
+            app:layout_marginPercent="1%"
+            app:layout_widthPercent="32%"
+            bind:board="@{board}"
+            bind:field="@{3}"
+            bind:handler="@{handler}"
+            bind:model="@{model.fields[3]}"/>
+
+        <include
+            layout="@layout/view_field"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            app:layout_aspectRatio="100%"
+            app:layout_marginPercent="1%"
+            app:layout_widthPercent="32%"
+            bind:board="@{board}"
+            bind:field="@{4}"
+            bind:handler="@{handler}"
+            bind:model="@{model.fields[4]}"/>
+
+        <include
+            layout="@layout/view_field"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            app:layout_aspectRatio="100%"
+            app:layout_marginPercent="1%"
+            app:layout_widthPercent="32%"
+            bind:board="@{board}"
+            bind:field="@{5}"
+            bind:handler="@{handler}"
+            bind:model="@{model.fields[5]}"/>
+
+        <include
+            layout="@layout/view_field"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            app:layout_aspectRatio="100%"
+            app:layout_marginPercent="1%"
+            app:layout_widthPercent="32%"
+            bind:board="@{board}"
+            bind:field="@{6}"
+            bind:handler="@{handler}"
+            bind:model="@{model.fields[6]}"/>
+
+        <include
+            layout="@layout/view_field"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            app:layout_aspectRatio="100%"
+            app:layout_marginPercent="1%"
+            app:layout_widthPercent="32%"
+            bind:board="@{board}"
+            bind:field="@{7}"
+            bind:handler="@{handler}"
+            bind:model="@{model.fields[7]}"/>
+
+        <include
+            layout="@layout/view_field"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            app:layout_aspectRatio="100%"
+            app:layout_marginPercent="1%"
+            app:layout_widthPercent="32%"
+            bind:board="@{board}"
+            bind:field="@{8}"
+            bind:handler="@{handler}"
+            bind:model="@{model.fields[8]}"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/inactive_overlay"
+            android:visibility="@{!availableInNextMove}"
+            app:duration="@{@integer/duration_short}"
+            tools:visibility="gone"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/winner_overlay"
+            android:clickable="true"
+            android:padding="20dp"
+            android:src="@{model.winner.icon}"
+            android:visibility="@{model.winner != WinnerType.NoneYet}"
+            app:duration="@{@integer/duration_medium}"
+            tools:src="@drawable/ic_cross"
+            tools:visibility="gone"/>
+
+    </android.support.percent.PercentRelativeLayout>
+</layout>
