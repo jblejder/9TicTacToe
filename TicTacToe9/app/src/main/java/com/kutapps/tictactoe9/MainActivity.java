@@ -1,16 +1,18 @@
 package com.kutapps.tictactoe9;
 
-import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.kutapps.tictactoe9.board.fragments.BoardFragment;
 import com.kutapps.tictactoe9.databinding.ActivityMainBinding;
+import com.kutapps.tictactoe9.gameSetup.fragments.GameSetupFragment;
 import com.kutapps.tictactoe9.shared.TransactionOptions;
+import com.kutapps.tictactoe9.shared.fragments.BaseFragment;
+import com.kutapps.tictactoe9.shared.fragments.callbacks.BaseFragmentCallback;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements BaseFragmentCallback
 {
     private ActivityMainBinding binding;
 
@@ -21,13 +23,16 @@ public class MainActivity extends AppCompatActivity
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         if (savedInstanceState == null)
         {
-            loadFragment(BoardFragment.newInstance(), TransactionOptions.JustReplace);
+            openFragment(GameSetupFragment.newInstance(), TransactionOptions.JustReplace);
         }
     }
 
-    private void loadFragment(Fragment frag, TransactionOptions options)
+    @Override
+    public <TBinding extends ViewDataBinding> void openFragment(BaseFragment<TBinding> frag,
+                                                                TransactionOptions options)
     {
         FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setTransitionStyle(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         switch (options)
         {
             case JustReplace:

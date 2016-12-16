@@ -1,6 +1,6 @@
 package com.kutapps.tictactoe9.shared.commands;
 
-import android.databinding.ObservableBoolean;
+import android.databinding.ObservableField;
 import android.util.Log;
 
 import org.jdeferred.Promise;
@@ -11,10 +11,10 @@ public class Command<TParam, TResult>
 {
 
     private CommandAction<TParam, TResult> command;
-    public  ObservableBoolean              isExecuting;
+    public  ObservableField<CommandState>  isExecuting;
 
     {
-        isExecuting = new ObservableBoolean(false);
+        isExecuting = new ObservableField<>(CommandState.NotStarted);
     }
 
 
@@ -25,7 +25,7 @@ public class Command<TParam, TResult>
 
     public final Promise<TResult, Throwable, Integer> execute(TParam param)
     {
-        isExecuting.set(true);
+        isExecuting.set(CommandState.Executing);
 
         DeferredAsyncTask<TParam, Integer, TResult> task = new DeferredAsyncTask<TParam, Integer,
                 TResult>()
@@ -37,9 +37,11 @@ public class Command<TParam, TResult>
                 return command.execute(params[0]);
             }
         };
-        Promise<TResult, Throwable, Integer> promise = task.promise().fail(result -> Log.e
-                ("Command", result.getMessage(), result)).always((state, resolved, rejected) ->
-                isExecuting.set(false));
+        Promise<TResult, Throwable, Integer> promise = task.promise().done(result -> isExecuting
+                .set(CommandState.Succeeded)).fail(result -> {
+            Log.e("Command", result.getMessage(), result);
+            isExecuting.set(CommandState.Error);
+        });
 
         task.execute(param);
 

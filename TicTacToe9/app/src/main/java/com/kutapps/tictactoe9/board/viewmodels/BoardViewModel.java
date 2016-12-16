@@ -82,6 +82,7 @@ public class BoardViewModel
     {
         Stream.of(boards).forEach(SingleBoardViewModel::randomize);
         winner.set(findWinner());
+        nextBoardNumber.set(ALL_BOARDS);
         return null;
     }
 

@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="model"
+            type="com.kutapps.tictactoe9.gameSetup.viewmodels.GameSetupViewModel"/>
+
+        <variable
+            name="handler"
+            type="com.kutapps.tictactoe9.gameSetup.fragments.handlers.GameSetupHandler"/>
+
+        <import type="com.kutapps.tictactoe9.board.consts.MarkerType"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:paddingBottom="16dp"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp">
+
+        <requestFocus/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:gravity="center_vertical"
+            android:onClick="@{v-> handler.onChangeUserName()}"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/margin_large"
+            android:paddingTop="@dimen/margin_large">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/your_name_is"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{model.setup.username}"
+                android:textStyle="bold"
+                tools:text="Janusz"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:paddingEnd="@dimen/margin_medium"
+                android:paddingStart="@dimen/margin_medium"
+                android:text="@string/change"
+                android:textColor="@color/colorAccent"/>
+        </LinearLayout>
+
+        <net.cachapa.expandablelayout.ExpandableLayout
+            android:id="@+id/usernameContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:el_duration="@integer/duration_short"
+            app:el_expanded="false"
+            app:el_translate_children="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/usernameInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/etUsername"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/username"
+                        android:imeOptions="actionDone"
+                        android:inputType="textAutoComplete"
+                        android:maxLength="20"
+                        android:maxLines="1"
+                        android:minWidth="150dp"
+                        android:padding="10dp"
+                        android:text="@={model.username}"
+                        app:layout_expandable="true"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:onClick="@{v -> handler.onApproveUserName()}"
+                    android:text="@android:string/ok"/>
+            </LinearLayout>
+        </net.cachapa.expandablelayout.ExpandableLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:gravity="center_vertical"
+            android:onClick="@{v-> handler.onChangeRoomName()}"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/margin_large"
+            android:paddingTop="@dimen/margin_large">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/room_name_is"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{model.setup.roomName}"
+                android:textStyle="bold"
+                tools:text="Pokuj"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:paddingEnd="@dimen/margin_medium"
+                android:paddingStart="@dimen/margin_medium"
+                android:text="@string/change"
+                android:textColor="@color/colorAccent"/>
+        </LinearLayout>
+
+        <net.cachapa.expandablelayout.ExpandableLayout
+            android:id="@+id/roomEditContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:el_duration="@integer/duration_short"
+            app:el_expanded="false"
+            app:el_translate_children="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/roomInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/etRoomName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/room_name"
+                        android:imeOptions="actionDone"
+                        android:inputType="textAutoComplete"
+                        android:maxLength="20"
+                        android:maxLines="1"
+                        android:minWidth="150dp"
+                        android:padding="10dp"
+                        android:text="@={model.roomName}"
+                        app:layout_expandable="true"/>
+
+                </android.support.design.widget.TextInputLayout>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:onClick="@{v -> handler.onApproveRoomName()}"
+                    android:text="@android:string/ok"/>
+            </LinearLayout>
+        </net.cachapa.expandablelayout.ExpandableLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:gravity="center_vertical"
+            android:onClick="@{v-> handler.onChangeMarker()}"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/margin_large"
+            android:paddingTop="@dimen/margin_large">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/initial_marker_is"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@{model.setup.marker.icon}"
+                android:visibility="@{model.setup.marker != MarkerType.None}"
+                tools:src="@drawable/ic_cross"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/random"
+                android:textStyle="bold"
+                android:visibility="@{model.setup.marker == MarkerType.None}"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:paddingEnd="@dimen/margin_medium"
+                android:paddingStart="@dimen/margin_medium"
+                android:text="@string/change"
+                android:textColor="@color/colorAccent"/>
+        </LinearLayout>
+
+        <net.cachapa.expandablelayout.ExpandableLayout
+            android:id="@+id/markerEditContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:el_duration="@integer/duration_short"
+            app:el_expanded="false"
+            app:el_translate_children="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{v -> handler.onApproveMarker(MarkerType.Cross)}"
+                    android:src="@{MarkerType.Cross.icon}"
+                    tools:src="@drawable/ic_cross"/>
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{v -> handler.onApproveMarker(MarkerType.Nought)}"
+                    android:src="@{MarkerType.Nought.icon}"
+                    tools:src="@drawable/ic_nought"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{v -> handler.onApproveMarker(MarkerType.None)}"
+                    android:text="@string/random"/>
+            </LinearLayout>
+        </net.cachapa.expandablelayout.ExpandableLayout>
+
+        <android.support.v4.widget.Space
+            android:layout_width="0dp"
+            android:layout_height="32dp"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="@{v -> handler.onClickStart()}"
+            android:text="@string/start_game"/>
+    </LinearLayout>
+</layout>
