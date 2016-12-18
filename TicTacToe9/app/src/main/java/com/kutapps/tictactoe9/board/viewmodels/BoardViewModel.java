@@ -7,16 +7,17 @@ import android.util.Pair;
 import com.annimon.stream.Stream;
 import com.kutapps.tictactoe9.board.consts.MarkerType;
 import com.kutapps.tictactoe9.board.consts.WinnerType;
+import com.kutapps.tictactoe9.gameSetup.models.GameSetupModel;
 import com.kutapps.tictactoe9.shared.commands.Command;
 
 public class BoardViewModel
 {
     public static final int ALL_BOARDS = Integer.MIN_VALUE;
 
-    public final  SingleBoardViewModel[]      boards;
-    private final ObservableField<MarkerType> currentMarker;
-    public final  ObservableField<WinnerType> winner;
-    public final  ObservableInt               nextBoardNumber;
+    public final SingleBoardViewModel[]      boards;
+    public final ObservableField<MarkerType> currentMarker;
+    public final ObservableField<WinnerType> winner;
+    public final ObservableInt               nextBoardNumber;
 
     public Command<Pair<Integer, Integer>, Void> moveCommand;
     public Command<Void, Void>                   clearCommand;
@@ -24,19 +25,30 @@ public class BoardViewModel
 
     {
         boards = new SingleBoardViewModel[9];
-        currentMarker = new ObservableField<>(MarkerType.Cross);
+        currentMarker = new ObservableField<>();
         winner = new ObservableField<>(WinnerType.NoneYet);
         nextBoardNumber = new ObservableInt(ALL_BOARDS);
     }
 
 
-    public BoardViewModel()
+    public BoardViewModel(GameSetupModel setup)
     {
         for (int i = 0; i < boards.length; i++)
         {
             boards[i] = new SingleBoardViewModel();
         }
+        init(setup);
         initCommands();
+    }
+
+    private void init(GameSetupModel setup)
+    {
+        MarkerType selected = setup.marker.get();
+        if (selected == MarkerType.None)
+        {
+            selected = Math.random() > 0.5 ? MarkerType.Cross : MarkerType.Nought;
+        }
+        currentMarker.set(selected);
     }
 
     private void initCommands()

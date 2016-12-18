@@ -23,7 +23,6 @@ public class GameSetupFragment extends BaseFragment<FragmentGameSetupBinding> im
         return new GameSetupFragment();
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -142,6 +141,7 @@ public class GameSetupFragment extends BaseFragment<FragmentGameSetupBinding> im
     @Override
     public void onClickStart()
     {
-        callback.openFragment(BoardFragment.newInstance(), TransactionOptions.JustReplace);
+        callback.openFragment(BoardFragment.newInstance(model.setup.get()), TransactionOptions
+                .AddToBackStack);
     }
 }

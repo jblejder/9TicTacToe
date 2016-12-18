@@ -1,5 +1,6 @@
 package com.kutapps.tictactoe9;
 
+import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
@@ -11,6 +12,7 @@ import com.kutapps.tictactoe9.gameSetup.fragments.GameSetupFragment;
 import com.kutapps.tictactoe9.shared.TransactionOptions;
 import com.kutapps.tictactoe9.shared.fragments.BaseFragment;
 import com.kutapps.tictactoe9.shared.fragments.callbacks.BaseFragmentCallback;
+import com.kutapps.tictactoe9.shared.interfaces.OnBackPressedListener;
 
 public class MainActivity extends AppCompatActivity implements BaseFragmentCallback
 {
@@ -40,9 +42,30 @@ public class MainActivity extends AppCompatActivity implements BaseFragmentCallb
                 break;
             case AddToBackStack:
                 ft.addToBackStack(null);
-                ft.add(binding.container.getId(), frag, frag.getClass().getSimpleName());
+                ft.replace(binding.container.getId(), frag, frag.getClass().getSimpleName());
                 break;
         }
         ft.commit();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        Fragment currentFragment = getCurrentFragment();
+        boolean handled = false;
+        if (currentFragment != null && currentFragment instanceof OnBackPressedListener)
+        {
+            handled = ((OnBackPressedListener) currentFragment).onBackPressed();
+        }
+
+        if (!handled)
+        {
+            super.onBackPressed();
+        }
+    }
+
+    private Fragment getCurrentFragment()
+    {
+        return getFragmentManager().findFragmentById(binding.container.getId());
     }
 }
