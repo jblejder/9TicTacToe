@@ -5,8 +5,10 @@ import android.databinding.ObservableInt;
 import android.util.Pair;
 
 import com.annimon.stream.Stream;
+import com.google.firebase.auth.FirebaseUser;
 import com.kutapps.tictactoe9.board.consts.MarkerType;
 import com.kutapps.tictactoe9.board.consts.WinnerType;
+import com.kutapps.tictactoe9.board.models.DatabaseGameModel;
 import com.kutapps.tictactoe9.gameSetup.models.GameSetupModel;
 import com.kutapps.tictactoe9.shared.commands.Command;
 
@@ -22,12 +24,15 @@ public class BoardViewModel
     public Command<Pair<Integer, Integer>, Void> moveCommand;
     public Command<Void, Void>                   clearCommand;
     public Command<Void, Void>                   randomizeCommand;
+    public ObservableField<FirebaseUser>         currentUser;
+    public Command<DatabaseGameModel, Void>      initialize;
 
     {
         boards = new SingleBoardViewModel[9];
         currentMarker = new ObservableField<>();
         winner = new ObservableField<>(WinnerType.NoneYet);
         nextBoardNumber = new ObservableInt(ALL_BOARDS);
+        currentUser = new ObservableField<>();
     }
 
 
@@ -56,6 +61,7 @@ public class BoardViewModel
         moveCommand = new Command<>(this::move);
         clearCommand = new Command<>(this::clear);
         randomizeCommand = new Command<>(this::randomize);
+        initialize = new Command<>(this::init);
     }
 
     private Void move(Pair<Integer, Integer> param)
@@ -179,5 +185,10 @@ public class BoardViewModel
         {
             return ALL_BOARDS;
         }
+    }
+
+    private Void init(DatabaseGameModel param)
+    {
+        return null;
     }
 }

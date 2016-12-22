@@ -2,6 +2,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
+    final String DATABASE_URL = "\"https://tictactoe-220bf.firebaseio.com\"";
+
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
@@ -15,6 +17,7 @@ android {
     buildTypes {
         debug {
             versionNameSuffix "-debug"
+            buildConfigField "String", "DATABASE_URL", DATABASE_URL
             signingConfig signingConfigs.debug
         }
         release {
@@ -63,6 +66,8 @@ dependencies {
     compile "com.android.support:percent:${supportLibVersion}"
     compile "com.android.support:appcompat-v7:${supportLibVersion}"
     compile "com.android.support:design:${supportLibVersion}"
+    compile 'com.google.firebase:firebase-database:10.0.1'
+    compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'org.jdeferred:jdeferred-android-aar:1.2.4'
     compile 'com.annimon:stream:1.1.4'
     compile 'net.cachapa.expandablelayout:expandablelayout:2.4'

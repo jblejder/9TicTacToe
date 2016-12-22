@@ -7,6 +7,7 @@ import com.kutapps.tictactoe9.R;
 import com.kutapps.tictactoe9.board.consts.MarkerType;
 import com.kutapps.tictactoe9.board.fragments.BoardFragment;
 import com.kutapps.tictactoe9.databinding.FragmentGameSetupBinding;
+import com.kutapps.tictactoe9.gameSetup.consts.GameMode;
 import com.kutapps.tictactoe9.gameSetup.fragments.handlers.GameSetupHandler;
 import com.kutapps.tictactoe9.gameSetup.viewmodels.GameSetupViewModel;
 import com.kutapps.tictactoe9.shared.TransactionOptions;
@@ -49,22 +50,43 @@ public class GameSetupFragment extends BaseFragment<FragmentGameSetupBinding> im
                 }
             }
         });
-        model.changeRoomNameCommand.isExecuting.addOnPropertyChangedCallback(new Observable
+        model.changeHostedRoomNameCommand.isExecuting.addOnPropertyChangedCallback(new Observable
                 .OnPropertyChangedCallback()
         {
             @Override
             public void onPropertyChanged(Observable observable, int i)
             {
-                CommandState state = model.changeRoomNameCommand.isExecuting.get();
+                CommandState state = model.changeHostedRoomNameCommand.isExecuting.get();
                 switch (state)
                 {
                     case Executing:
                         break;
                     case Succeeded:
-                        binding.roomEditContainer.collapse();
+                        binding.hostedRoomEditContainer.collapse();
                         break;
                     case Error:
-                        binding.roomInput.setError(getString(R.string
+                        binding.hostedRoomInput.setError(getString(R.string
+                                .username_should_not_be_empty));
+                        break;
+                }
+            }
+        });
+        model.changeJoinedRoomNameCommand.isExecuting.addOnPropertyChangedCallback(new Observable
+                .OnPropertyChangedCallback()
+        {
+            @Override
+            public void onPropertyChanged(Observable observable, int i)
+            {
+                CommandState state = model.changeJoinedRoomNameCommand.isExecuting.get();
+                switch (state)
+                {
+                    case Executing:
+                        break;
+                    case Succeeded:
+                        binding.joinedRoomEditContainer.collapse();
+                        break;
+                    case Error:
+                        binding.joiningRoomInput.setError(getString(R.string
                                 .username_should_not_be_empty));
                         break;
                 }
@@ -90,6 +112,7 @@ public class GameSetupFragment extends BaseFragment<FragmentGameSetupBinding> im
     {
         binding.usernameInput.setError(null);
         model.username.set(model.setup.get().username.get());
+        binding.etJoiningRoomName.requestFocus();
         binding.etUsername.setSelection(binding.etUsername.getText().length());
         closeAllEditContainers();
         binding.usernameContainer.toggle();
@@ -99,22 +122,6 @@ public class GameSetupFragment extends BaseFragment<FragmentGameSetupBinding> im
     public void onApproveUserName()
     {
         model.changeNameCommand.execute(null);
-    }
-
-    @Override
-    public void onChangeRoomName()
-    {
-        binding.roomInput.setError(null);
-        model.roomName.set(model.setup.get().roomName.get());
-        binding.etRoomName.setSelection(binding.etRoomName.getText().length());
-        closeAllEditContainers();
-        binding.roomEditContainer.toggle();
-    }
-
-    @Override
-    public void onApproveRoomName()
-    {
-        model.changeRoomNameCommand.execute(null);
     }
 
     @Override
@@ -128,7 +135,8 @@ public class GameSetupFragment extends BaseFragment<FragmentGameSetupBinding> im
     {
         binding.markerEditContainer.collapse();
         binding.usernameContainer.collapse();
-        binding.roomEditContainer.collapse();
+        binding.hostedRoomEditContainer.collapse();
+        binding.joinedRoomEditContainer.collapse();
     }
 
     @Override
@@ -139,8 +147,49 @@ public class GameSetupFragment extends BaseFragment<FragmentGameSetupBinding> im
     }
 
     @Override
-    public void onClickStart()
+    public void onApproveHostRoomName()
     {
+        model.changeHostedRoomNameCommand.execute(null);
+    }
+
+    @Override
+    public void onChangeHostedRoomName()
+    {
+        binding.hostedRoomInput.setError(null);
+        model.hostedRoomName.set(model.setup.get().hostedRoomName.get());
+        binding.etHostedRoomName.setSelection(binding.etHostedRoomName.getText().length());
+        closeAllEditContainers();
+        binding.hostedRoomEditContainer.toggle();
+    }
+
+    @Override
+    public void onClickHostGame()
+    {
+        model.setup.get().mode.set(GameMode.Host);
+        callback.openFragment(BoardFragment.newInstance(model.setup.get()), TransactionOptions
+                .AddToBackStack);
+    }
+
+    @Override
+    public void onChangeJoiningRoomName()
+    {
+        binding.joiningRoomInput.setError(null);
+        model.joiningRoomName.set(model.setup.get().joiningRoomName.get());
+        binding.etJoiningRoomName.setSelection(binding.etJoiningRoomName.getText().length());
+        closeAllEditContainers();
+        binding.joinedRoomEditContainer.toggle();
+    }
+
+    @Override
+    public void onApproveJoiningRoomName()
+    {
+        model.changeJoinedRoomNameCommand.execute(null);
+    }
+
+    @Override
+    public void onClickJoinGame()
+    {
+        model.setup.get().mode.set(GameMode.Join);
         callback.openFragment(BoardFragment.newInstance(model.setup.get()), TransactionOptions
                 .AddToBackStack);
     }
