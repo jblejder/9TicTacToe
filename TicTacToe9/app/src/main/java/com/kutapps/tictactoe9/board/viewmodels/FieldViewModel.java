@@ -22,4 +22,9 @@ public class FieldViewModel
         marker.set(Math.random() > .5 ? MarkerType.None : Math.random() > .5 ? MarkerType.Cross :
                 MarkerType.Nought);
     }
+
+    public void loadState(MarkerType markerType)
+    {
+        marker.set(markerType);
+    }
 }

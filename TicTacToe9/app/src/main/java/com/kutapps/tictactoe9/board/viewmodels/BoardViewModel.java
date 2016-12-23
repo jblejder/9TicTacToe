@@ -8,7 +8,7 @@ import com.annimon.stream.Stream;
 import com.google.firebase.auth.FirebaseUser;
 import com.kutapps.tictactoe9.board.consts.MarkerType;
 import com.kutapps.tictactoe9.board.consts.WinnerType;
-import com.kutapps.tictactoe9.board.models.DatabaseGameModel;
+import com.kutapps.tictactoe9.board.models.database.DatabaseGameModel;
 import com.kutapps.tictactoe9.gameSetup.models.GameSetupModel;
 import com.kutapps.tictactoe9.shared.commands.Command;
 
@@ -18,14 +18,18 @@ public class BoardViewModel
 
     public final SingleBoardViewModel[]      boards;
     public final ObservableField<MarkerType> currentMarker;
-    public final ObservableField<WinnerType> winner;
     public final ObservableInt               nextBoardNumber;
+
+    public final ObservableField<WinnerType> winner;
+
+    public GameSetupModel gameSetup;
+    public String         secondUserId;
 
     public Command<Pair<Integer, Integer>, Void> moveCommand;
     public Command<Void, Void>                   clearCommand;
     public Command<Void, Void>                   randomizeCommand;
     public ObservableField<FirebaseUser>         currentUser;
-    public Command<DatabaseGameModel, Void>      initialize;
+    public Command<DatabaseGameModel, Void>      loadStateCommand;
 
     {
         boards = new SingleBoardViewModel[9];
@@ -35,25 +39,22 @@ public class BoardViewModel
         currentUser = new ObservableField<>();
     }
 
-
     public BoardViewModel(GameSetupModel setup)
     {
+        gameSetup = setup;
         for (int i = 0; i < boards.length; i++)
         {
             boards[i] = new SingleBoardViewModel();
         }
-        init(setup);
-        initCommands();
-    }
 
-    private void init(GameSetupModel setup)
-    {
         MarkerType selected = setup.marker.get();
         if (selected == MarkerType.None)
         {
             selected = Math.random() > 0.5 ? MarkerType.Cross : MarkerType.Nought;
         }
         currentMarker.set(selected);
+
+        initCommands();
     }
 
     private void initCommands()
@@ -61,7 +62,7 @@ public class BoardViewModel
         moveCommand = new Command<>(this::move);
         clearCommand = new Command<>(this::clear);
         randomizeCommand = new Command<>(this::randomize);
-        initialize = new Command<>(this::init);
+        loadStateCommand = new Command<>(this::loadState);
     }
 
     private Void move(Pair<Integer, Integer> param)
@@ -187,8 +188,28 @@ public class BoardViewModel
         }
     }
 
-    private Void init(DatabaseGameModel param)
+    private Void loadState(DatabaseGameModel param)
     {
+        String userId = currentUser.get().getUid();
+        if (param.hostId.equals(userId))
+        {
+            secondUserId = param.userId;
+        }
+        else if (param.userId != null && param.userId.equals(userId))
+        {
+            param.hostId = param.userId;
+        }
+        else
+        {
+            throw new IllegalStateException("User should not play in this game");
+        }
+        for (int i = 0; i < boards.length; i++)
+        {
+            boards[i].loadState(param.smallBoards.get(i));
+        }
+        winner.set(findWinner());
+        //nextBoardNumber.set(ALL_BOARDS);
+
         return null;
     }
 }

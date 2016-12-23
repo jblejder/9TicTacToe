@@ -1,5 +1,6 @@
 package com.kutapps.tictactoe9.board.fragments;
 
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Pair;
@@ -14,7 +15,7 @@ import com.google.gson.Gson;
 import com.kutapps.tictactoe9.R;
 import com.kutapps.tictactoe9.board.fragments.handlers.BoardHandler;
 import com.kutapps.tictactoe9.board.mappers.DatabaseMapper;
-import com.kutapps.tictactoe9.board.models.DatabaseGameModel;
+import com.kutapps.tictactoe9.board.models.database.DatabaseGameModel;
 import com.kutapps.tictactoe9.board.viewmodels.BoardViewModel;
 import com.kutapps.tictactoe9.databinding.FragmentBoardBinding;
 import com.kutapps.tictactoe9.gameSetup.models.GameSetupModel;
@@ -28,9 +29,9 @@ public class BoardFragment extends AuthFragment<FragmentBoardBinding> implements
 {
     private static final String DATA_KEY             = "board.setup";
     private static final int    BACK_CONFIRM_SECONDS = 2;
-    private BoardViewModel model;
-    private DateTime       warningTimestamp;
-    private GameSetupModel setup;
+    private BoardViewModel    model;
+    private DateTime          warningTimestamp;
+    private DatabaseReference roomReference;
 
     //region newInstance
     public static BoardFragment newInstance(GameSetupModel setup)
@@ -64,54 +65,63 @@ public class BoardFragment extends AuthFragment<FragmentBoardBinding> implements
     {
         if (getArguments() != null && getArguments().containsKey(DATA_KEY))
         {
-            GameSetupModel setup = getSetup();
+            String dataRaw = getArguments().getString(DATA_KEY);
+            GameSetupModel setup = new Gson().fromJson(dataRaw, GameSetupModel.class);
+
             model = new BoardViewModel(setup);
         }
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("test");
-        myRef.setValue("Elo");
-
         warningTimestamp = DateTime.now().minusSeconds(BACK_CONFIRM_SECONDS);
-        super.onCreate(savedInstanceState);
-    }
 
-    private GameSetupModel getSetup()
-    {
-        String dataRaw = getArguments().getString(DATA_KEY);
-        return new Gson().fromJson(dataRaw, GameSetupModel.class);
+        roomReference = FirebaseDatabase.getInstance().getReference("rooms/" + model.gameSetup
+                .getRoomId());
+        model.moveCommand.isExecuting.addOnPropertyChangedCallback(new Observable
+                .OnPropertyChangedCallback()
+
+        {
+            @Override
+            public void onPropertyChanged(Observable observable, int i)
+            {
+                switch (model.moveCommand.isExecuting.get())
+                {
+                    case NotStarted:
+                        break;
+                    case Executing:
+                        break;
+                    case Succeeded:
+                        roomReference.setValue(DatabaseMapper.mapBoardToDb(model));
+                        break;
+                    case Error:
+                        break;
+                }
+            }
+        });
+        super.onCreate(savedInstanceState);
     }
 
     @Override
     protected void onUserLogged(FirebaseUser user)
     {
         model.currentUser.set(user);
-        DatabaseReference room = FirebaseDatabase.getInstance().getReference("rooms/" + getSetup
-                ().getPlayingRoomName());
-        room.addListenerForSingleValueEvent(new ValueEventListener()
+        roomReference.addListenerForSingleValueEvent(new ValueEventListener()
         {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
                 if (dataSnapshot.exists())
                 {
-                    model.initialize.execute(DatabaseMapper.mapBoard(dataSnapshot.getValue()));
+                    model.loadStateCommand.execute(dataSnapshot.getValue(DatabaseGameModel.class));
                 }
                 else
                 {
-                    DatabaseGameModel mode = new DatabaseGameModel();
-                    mode.id = getSetup().hostedRoomName.get();
-                    mode.hostId = model.currentUser.get().getUid();
-                    mode.board =new Gson().toJson(model.boards);
-
-                    room.setValue(mode);
+                    roomReference.setValue(DatabaseMapper.mapBoardToDb(model));
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError)
             {
-
+                int i = 13;
             }
         });
     }

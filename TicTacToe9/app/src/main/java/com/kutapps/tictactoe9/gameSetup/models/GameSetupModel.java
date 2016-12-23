@@ -29,7 +29,7 @@ public class GameSetupModel
         marker.set(MarkerType.Nought);
     }
 
-    public String getPlayingRoomName()
+    public String getRoomId()
     {
         switch (mode.get())
         {
