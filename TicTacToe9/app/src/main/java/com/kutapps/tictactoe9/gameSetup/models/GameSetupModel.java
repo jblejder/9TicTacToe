@@ -25,7 +25,7 @@ public class GameSetupModel
     {
         username.set("Janusz");
         hostedRoomName.set("Elo");
-        joiningRoomName.set("RandomElo");
+        joiningRoomName.set("Elo");
         marker.set(MarkerType.Nought);
     }
 

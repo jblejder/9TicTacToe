@@ -15,6 +15,8 @@ import com.google.gson.Gson;
 import com.kutapps.tictactoe9.R;
 import com.kutapps.tictactoe9.board.fragments.handlers.BoardHandler;
 import com.kutapps.tictactoe9.board.mappers.DatabaseMapper;
+import com.kutapps.tictactoe9.board.mappers.UserMapper;
+import com.kutapps.tictactoe9.board.models.PlayerModel;
 import com.kutapps.tictactoe9.board.models.database.DatabaseGameModel;
 import com.kutapps.tictactoe9.board.viewmodels.BoardViewModel;
 import com.kutapps.tictactoe9.databinding.FragmentBoardBinding;
@@ -65,16 +67,12 @@ public class BoardFragment extends AuthFragment<FragmentBoardBinding> implements
     {
         if (getArguments() != null && getArguments().containsKey(DATA_KEY))
         {
-            String dataRaw = getArguments().getString(DATA_KEY);
-            GameSetupModel setup = new Gson().fromJson(dataRaw, GameSetupModel.class);
-
-            model = new BoardViewModel(setup);
+            model = new BoardViewModel(getSetup());
         }
 
         warningTimestamp = DateTime.now().minusSeconds(BACK_CONFIRM_SECONDS);
 
-        roomReference = FirebaseDatabase.getInstance().getReference("rooms/" + model.gameSetup
-                .getRoomId());
+        roomReference = FirebaseDatabase.getInstance().getReference("rooms/" + model.roomId);
         model.moveCommand.isExecuting.addOnPropertyChangedCallback(new Observable
                 .OnPropertyChangedCallback()
 
@@ -84,14 +82,8 @@ public class BoardFragment extends AuthFragment<FragmentBoardBinding> implements
             {
                 switch (model.moveCommand.isExecuting.get())
                 {
-                    case NotStarted:
-                        break;
-                    case Executing:
-                        break;
                     case Succeeded:
                         roomReference.setValue(DatabaseMapper.mapBoardToDb(model));
-                        break;
-                    case Error:
                         break;
                 }
             }
@@ -99,22 +91,29 @@ public class BoardFragment extends AuthFragment<FragmentBoardBinding> implements
         super.onCreate(savedInstanceState);
     }
 
+    private GameSetupModel getSetup()
+    {
+        String dataRaw = getArguments().getString(DATA_KEY);
+
+        return new Gson().fromJson(dataRaw, GameSetupModel.class);
+    }
+
     @Override
     protected void onUserLogged(FirebaseUser user)
     {
-        model.currentUser.set(user);
         roomReference.addListenerForSingleValueEvent(new ValueEventListener()
         {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
-                if (dataSnapshot.exists())
+                switch (model.gameMode)
                 {
-                    model.loadStateCommand.execute(dataSnapshot.getValue(DatabaseGameModel.class));
-                }
-                else
-                {
-                    roomReference.setValue(DatabaseMapper.mapBoardToDb(model));
+                    case Host:
+                        initHostedGame(user, dataSnapshot);
+                        break;
+                    case Join:
+                        initJoinedGame(user, dataSnapshot);
+                        break;
                 }
             }
 
@@ -124,6 +123,32 @@ public class BoardFragment extends AuthFragment<FragmentBoardBinding> implements
                 int i = 13;
             }
         });
+    }
+
+    private void initHostedGame(FirebaseUser user, DataSnapshot dataSnapshot)
+    {
+        PlayerModel player = UserMapper.mapHost(user, getSetup().marker.get());
+        if (dataSnapshot.exists())
+        {
+            DatabaseGameModel game = dataSnapshot.getValue(DatabaseGameModel.class);
+            model.loadStateCommand.execute(game);
+        }
+        else
+        {
+            roomReference.setValue(DatabaseMapper.mapBoardToDb(model));
+        }
+        model.currentUser.set(player);
+    }
+
+    private void initJoinedGame(FirebaseUser user, DataSnapshot dataSnapshot)
+    {
+        if (dataSnapshot.exists())
+        {
+            DatabaseGameModel game = dataSnapshot.getValue(DatabaseGameModel.class);
+            model.loadStateCommand.execute(game).then(result -> {
+                model.currentUser.set(UserMapper.mapJoiner(user, game.host.marker));
+            });
+        }
     }
 
     @Override

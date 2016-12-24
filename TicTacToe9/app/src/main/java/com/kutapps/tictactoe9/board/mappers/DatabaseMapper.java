@@ -12,21 +12,23 @@ public class DatabaseMapper
     public static DatabaseGameModel mapBoardToDb(BoardViewModel model)
     {
         DatabaseGameModel game = new DatabaseGameModel();
-        switch (model.gameSetup.mode.get())
+        switch (model.gameMode)
         {
             case Host:
-                game.hostId = model.currentUser.get().getUid();
-                game.userId = model.secondUserId;
+                game.host = model.currentUser.get();
+                game.joiner = model.secondUser;
                 break;
             case Join:
-                game.hostId = model.secondUserId;
-                game.userId = model.currentUser.get().getUid();
+                game.host = model.secondUser;
+                game.joiner = model.currentUser.get();
                 break;
         }
         for (SingleBoardViewModel smallBoard : model.boards)
         {
             game.smallBoards.add(mapSmallBoard(smallBoard));
         }
+        game.nextMarker = model.currentMarker.get();
+        game.nextBoardNumber = model.nextBoardNumber.get();
 
         return game;
     }
