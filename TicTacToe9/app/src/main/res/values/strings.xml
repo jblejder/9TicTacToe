@@ -8,7 +8,8 @@
     <string name="room_name">Edytuj nazwę pokoju</string>
     <string name="initial_marker_is">Zaczyna:\u00A0</string>
     <string name="random">Losowo</string>
-    <string name="start_game">Start!</string>
+    <string name="start_host">Hostuj grę!</string>
     <string name="press_again_to_confirm">Wciśń aby wrócić.</string>
     <string name="next_move">Następny ruch:</string>
+    <string name="start_join">Dołącz</string>
 </resources>

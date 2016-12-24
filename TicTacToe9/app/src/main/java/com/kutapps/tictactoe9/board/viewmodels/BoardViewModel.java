@@ -7,48 +7,70 @@ import android.util.Pair;
 import com.annimon.stream.Stream;
 import com.kutapps.tictactoe9.board.consts.MarkerType;
 import com.kutapps.tictactoe9.board.consts.WinnerType;
+import com.kutapps.tictactoe9.board.models.PlayerModel;
+import com.kutapps.tictactoe9.board.models.database.DatabaseGameModel;
+import com.kutapps.tictactoe9.gameSetup.consts.GameMode;
 import com.kutapps.tictactoe9.gameSetup.models.GameSetupModel;
 import com.kutapps.tictactoe9.shared.commands.Command;
 
 public class BoardViewModel
 {
+    //region Const(s)
     public static final int ALL_BOARDS = Integer.MIN_VALUE;
+    //endregion
 
+    //region Field(s)
+
+    //region Game state
     public final SingleBoardViewModel[]      boards;
     public final ObservableField<MarkerType> currentMarker;
-    public final ObservableField<WinnerType> winner;
     public final ObservableInt               nextBoardNumber;
 
+    public final ObservableField<WinnerType> winner;
+    //endregion
+
+    //region Setup
+    public final GameMode    gameMode;
+    public final String      roomId;
+    public       PlayerModel secondUser;
+    //endregion
+    //endregion
+
+    //region Command(s)
     public Command<Pair<Integer, Integer>, Void> moveCommand;
     public Command<Void, Void>                   clearCommand;
     public Command<Void, Void>                   randomizeCommand;
+    public ObservableField<PlayerModel>          currentUser;
+    public Command<DatabaseGameModel, Void>      loadStateCommand;
+    //endregion
 
+    //region Constructor(s)
     {
         boards = new SingleBoardViewModel[9];
         currentMarker = new ObservableField<>();
         winner = new ObservableField<>(WinnerType.NoneYet);
         nextBoardNumber = new ObservableInt(ALL_BOARDS);
+        currentUser = new ObservableField<>();
     }
-
 
     public BoardViewModel(GameSetupModel setup)
     {
+        gameMode = setup.mode.get();
+        roomId = setup.getRoomId();
+
         for (int i = 0; i < boards.length; i++)
         {
             boards[i] = new SingleBoardViewModel();
         }
-        init(setup);
-        initCommands();
-    }
 
-    private void init(GameSetupModel setup)
-    {
         MarkerType selected = setup.marker.get();
         if (selected == MarkerType.None)
         {
             selected = Math.random() > 0.5 ? MarkerType.Cross : MarkerType.Nought;
         }
         currentMarker.set(selected);
+
+        initCommands();
     }
 
     private void initCommands()
@@ -56,8 +78,11 @@ public class BoardViewModel
         moveCommand = new Command<>(this::move);
         clearCommand = new Command<>(this::clear);
         randomizeCommand = new Command<>(this::randomize);
+        loadStateCommand = new Command<>(this::loadState);
     }
+    //endregion
 
+    //region Command Impl
     private Void move(Pair<Integer, Integer> param)
     {
         if (winner.get() != WinnerType.NoneYet)
@@ -67,6 +92,10 @@ public class BoardViewModel
         if (nextBoardNumber.get() != ALL_BOARDS && nextBoardNumber.get() != param.first)
         {
             throw new IllegalStateException("Wrong board");
+        }
+        if (currentUser.get().marker != currentMarker.get())
+        {
+            throw new IllegalStateException("It's second player move");
         }
 
         SingleBoardViewModel board = boards[param.first];
@@ -81,7 +110,7 @@ public class BoardViewModel
         return null;
     }
 
-    private Void clear(Void o)
+    private Void clear(Void... o)
     {
         Stream.of(boards).forEach(SingleBoardViewModel::clear);
         winner.set(findWinner());
@@ -98,7 +127,39 @@ public class BoardViewModel
         return null;
     }
 
-    private MarkerType getNextMarker(MarkerType currentMarker)
+    private Void loadState(DatabaseGameModel param)
+    {
+        if (gameMode == GameMode.Host)
+        {
+            secondUser = param.joiner;
+        }
+        else if (gameMode == GameMode.Join)
+        {
+            secondUser = param.host;
+        }
+        else
+        {
+            throw new IllegalStateException("User should not play in this game");
+        }
+
+        for (int i = 0; i < boards.length; i++)
+        {
+            boards[i].loadState(param.smallBoards.get(i));
+        }
+        winner.set(findWinner());
+        nextBoardNumber.set(param.nextBoardNumber);
+        currentMarker.set(param.nextMarker);
+        if (winner.get() != WinnerType.NoneYet)
+        {
+            clear();
+        }
+
+        return null;
+    }
+    //endregion
+
+    //region Method(s)
+    public static MarkerType getNextMarker(MarkerType currentMarker)
     {
         switch (currentMarker)
         {
@@ -180,4 +241,5 @@ public class BoardViewModel
             return ALL_BOARDS;
         }
     }
+    //endregion
 }

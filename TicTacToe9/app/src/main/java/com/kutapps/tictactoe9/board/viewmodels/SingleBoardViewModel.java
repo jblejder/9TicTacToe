@@ -5,6 +5,7 @@ import android.databinding.ObservableField;
 import com.annimon.stream.Stream;
 import com.kutapps.tictactoe9.board.consts.MarkerType;
 import com.kutapps.tictactoe9.board.consts.WinnerType;
+import com.kutapps.tictactoe9.board.models.database.DatabaseSmallBoardModel;
 
 
 public class SingleBoardViewModel
@@ -111,5 +112,14 @@ public class SingleBoardViewModel
         {
             return MarkerType.None;
         }
+    }
+
+    public void loadState(DatabaseSmallBoardModel dbModel)
+    {
+        for (int i = 0; i < fields.length; i++)
+        {
+            fields[i].loadState(dbModel.fields.get(i));
+        }
+        winner.set(findWinner());
     }
 }

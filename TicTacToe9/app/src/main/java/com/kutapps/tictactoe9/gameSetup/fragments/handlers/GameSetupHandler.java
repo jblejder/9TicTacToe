@@ -8,14 +8,22 @@ public interface GameSetupHandler
 
     void onApproveUserName();
 
-    void onChangeRoomName();
-
-    void onApproveRoomName();
-
     void onChangeMarker();
 
     void onApproveMarker(MarkerType type);
 
-    void onClickStart();
+
+    void onApproveHostRoomName();
+
+    void onChangeHostedRoomName();
+
+    void onClickHostGame();
+
+
+    void onChangeJoiningRoomName();
+
+    void onApproveJoiningRoomName();
+
+    void onClickJoinGame();
 
 }

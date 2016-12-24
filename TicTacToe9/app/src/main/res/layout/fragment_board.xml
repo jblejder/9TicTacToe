@@ -21,7 +21,8 @@
 
         <android.support.percent.PercentRelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="@{model.currentUser != null}">
 
             <android.support.percent.PercentRelativeLayout
                 android:id="@+id/board"
@@ -188,5 +189,11 @@
                     android:text="Czy mógłbyś mi wylosowac jakis układ?"/>
             </LinearLayout>
         </android.support.percent.PercentRelativeLayout>
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="@{model.currentUser == null}"/>
     </android.support.design.widget.CoordinatorLayout>
 </layout>

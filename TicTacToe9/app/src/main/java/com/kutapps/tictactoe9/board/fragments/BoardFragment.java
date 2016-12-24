@@ -1,27 +1,41 @@
 package com.kutapps.tictactoe9.board.fragments;
 
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Pair;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.kutapps.tictactoe9.R;
 import com.kutapps.tictactoe9.board.fragments.handlers.BoardHandler;
+import com.kutapps.tictactoe9.board.mappers.DatabaseMapper;
+import com.kutapps.tictactoe9.board.mappers.UserMapper;
+import com.kutapps.tictactoe9.board.models.PlayerModel;
+import com.kutapps.tictactoe9.board.models.database.DatabaseGameModel;
 import com.kutapps.tictactoe9.board.viewmodels.BoardViewModel;
 import com.kutapps.tictactoe9.databinding.FragmentBoardBinding;
 import com.kutapps.tictactoe9.gameSetup.models.GameSetupModel;
-import com.kutapps.tictactoe9.shared.fragments.BaseFragment;
+import com.kutapps.tictactoe9.shared.fragments.AuthFragment;
 import com.kutapps.tictactoe9.shared.interfaces.OnBackPressedListener;
 
 import org.joda.time.DateTime;
 
-public class BoardFragment extends BaseFragment<FragmentBoardBinding> implements BoardHandler,
+public class BoardFragment extends AuthFragment<FragmentBoardBinding> implements BoardHandler,
         OnBackPressedListener
 {
     private static final String DATA_KEY             = "board.setup";
     private static final int    BACK_CONFIRM_SECONDS = 2;
-    private BoardViewModel model;
-    private DateTime       warningTimestamp;
+    private BoardViewModel     model;
+    private DateTime           warningTimestamp;
+    private DatabaseReference  roomReference;
+    private ValueEventListener listener;
 
     //region newInstance
     public static BoardFragment newInstance(GameSetupModel setup)
@@ -55,12 +69,96 @@ public class BoardFragment extends BaseFragment<FragmentBoardBinding> implements
     {
         if (getArguments() != null && getArguments().containsKey(DATA_KEY))
         {
-            String dataRaw = getArguments().getString(DATA_KEY);
-            GameSetupModel setup = new Gson().fromJson(dataRaw, GameSetupModel.class);
-            model = new BoardViewModel(setup);
+            model = new BoardViewModel(getSetup());
         }
+
         warningTimestamp = DateTime.now().minusSeconds(BACK_CONFIRM_SECONDS);
+
+        roomReference = FirebaseDatabase.getInstance().getReference("rooms/" + model.roomId);
+        model.moveCommand.isExecuting.addOnPropertyChangedCallback(new Observable
+                .OnPropertyChangedCallback()
+
+        {
+            @Override
+            public void onPropertyChanged(Observable observable, int i)
+            {
+                switch (model.moveCommand.isExecuting.get())
+                {
+                    case Succeeded:
+                        roomReference.setValue(DatabaseMapper.mapBoardToDb(model));
+                        break;
+                }
+            }
+        });
+        listener = new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                switch (model.gameMode)
+                {
+                    case Host:
+                        initHostedGame(FirebaseAuth.getInstance().getCurrentUser(), dataSnapshot);
+                        break;
+                    case Join:
+                        initJoinedGame(FirebaseAuth.getInstance().getCurrentUser(), dataSnapshot);
+                        break;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+                int i = 13;
+            }
+        };
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        roomReference.removeEventListener(listener);
+        super.onDestroy();
+    }
+
+    private GameSetupModel getSetup()
+    {
+        String dataRaw = getArguments().getString(DATA_KEY);
+
+        return new Gson().fromJson(dataRaw, GameSetupModel.class);
+    }
+
+    @Override
+    protected void onUserLogged(FirebaseUser user)
+    {
+        roomReference.addValueEventListener(listener);
+    }
+
+    private void initHostedGame(FirebaseUser user, DataSnapshot dataSnapshot)
+    {
+        PlayerModel player = UserMapper.mapHost(user, getSetup().marker.get());
+        if (dataSnapshot.exists())
+        {
+            DatabaseGameModel game = dataSnapshot.getValue(DatabaseGameModel.class);
+            model.loadStateCommand.execute(game);
+        }
+        else
+        {
+            roomReference.setValue(DatabaseMapper.mapBoardToDb(model));
+        }
+        model.currentUser.set(player);
+    }
+
+    private void initJoinedGame(FirebaseUser user, DataSnapshot dataSnapshot)
+    {
+        if (dataSnapshot.exists())
+        {
+            DatabaseGameModel game = dataSnapshot.getValue(DatabaseGameModel.class);
+            model.loadStateCommand.execute(game).then(result -> {
+                model.currentUser.set(UserMapper.mapJoiner(user, game.host.marker));
+            });
+        }
     }
 
     @Override
