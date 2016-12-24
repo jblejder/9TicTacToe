@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.util.Pair;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,9 +32,10 @@ public class BoardFragment extends AuthFragment<FragmentBoardBinding> implements
 {
     private static final String DATA_KEY             = "board.setup";
     private static final int    BACK_CONFIRM_SECONDS = 2;
-    private BoardViewModel    model;
-    private DateTime          warningTimestamp;
-    private DatabaseReference roomReference;
+    private BoardViewModel     model;
+    private DateTime           warningTimestamp;
+    private DatabaseReference  roomReference;
+    private ValueEventListener listener;
 
     //region newInstance
     public static BoardFragment newInstance(GameSetupModel setup)
@@ -88,7 +90,36 @@ public class BoardFragment extends AuthFragment<FragmentBoardBinding> implements
                 }
             }
         });
+        listener = new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                switch (model.gameMode)
+                {
+                    case Host:
+                        initHostedGame(FirebaseAuth.getInstance().getCurrentUser(), dataSnapshot);
+                        break;
+                    case Join:
+                        initJoinedGame(FirebaseAuth.getInstance().getCurrentUser(), dataSnapshot);
+                        break;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError)
+            {
+                int i = 13;
+            }
+        };
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        roomReference.removeEventListener(listener);
+        super.onDestroy();
     }
 
     private GameSetupModel getSetup()
@@ -101,28 +132,7 @@ public class BoardFragment extends AuthFragment<FragmentBoardBinding> implements
     @Override
     protected void onUserLogged(FirebaseUser user)
     {
-        roomReference.addListenerForSingleValueEvent(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
-                switch (model.gameMode)
-                {
-                    case Host:
-                        initHostedGame(user, dataSnapshot);
-                        break;
-                    case Join:
-                        initJoinedGame(user, dataSnapshot);
-                        break;
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-                int i = 13;
-            }
-        });
+        roomReference.addValueEventListener(listener);
     }
 
     private void initHostedGame(FirebaseUser user, DataSnapshot dataSnapshot)
