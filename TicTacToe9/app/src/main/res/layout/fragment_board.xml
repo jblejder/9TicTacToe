@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:bind="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="model"
+            type="com.kutapps.tictactoe9.board.viewmodels.BoardViewModel"/>
+
+        <variable
+            name="handler"
+            type="com.kutapps.tictactoe9.board.fragments.handlers.BoardHandler"/>
+    </data>
+
+    <android.support.design.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.percent.PercentRelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="@{model.currentUser != null}">
+
+            <android.support.percent.PercentRelativeLayout
+                android:id="@+id/board"
+                app:layout_aspectRatio="100%"
+                app:layout_widthPercent="100%">
+
+                <include
+                    layout="@layout/view_board_mini"
+                    app:layout_aspectRatio="100%"
+                    app:layout_marginPercent="1%"
+                    app:layout_widthPercent="32%"
+                    bind:availableInNextMove="@{model.nextBoardNumber == model.ALL_BOARDS || model.nextBoardNumber == 0}"
+                    bind:board="@{0}"
+                    bind:handler="@{handler}"
+                    bind:model="@{model.boards[0]}"/>
+
+                <include
+                    layout="@layout/view_board_mini"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_centerHorizontal="true"
+                    app:layout_aspectRatio="100%"
+                    app:layout_marginPercent="1%"
+                    app:layout_widthPercent="32%"
+                    bind:availableInNextMove="@{model.nextBoardNumber == model.ALL_BOARDS || model.nextBoardNumber == 1}"
+                    bind:board="@{1}"
+                    bind:handler="@{handler}"
+                    bind:model="@{model.boards[1]}"/>
+
+                <include
+                    layout="@layout/view_board_mini"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_alignParentEnd="true"
+                    app:layout_aspectRatio="100%"
+                    app:layout_marginPercent="1%"
+                    app:layout_widthPercent="32%"
+                    bind:availableInNextMove="@{model.nextBoardNumber == model.ALL_BOARDS || model.nextBoardNumber == 2}"
+                    bind:board="@{2}"
+                    bind:handler="@{handler}"
+                    bind:model="@{model.boards[2]}"/>
+
+                <include
+                    layout="@layout/view_board_mini"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    app:layout_aspectRatio="100%"
+                    app:layout_marginPercent="1%"
+                    app:layout_widthPercent="32%"
+                    bind:availableInNextMove="@{model.nextBoardNumber == model.ALL_BOARDS || model.nextBoardNumber == 3}"
+                    bind:board="@{3}"
+                    bind:handler="@{handler}"
+                    bind:model="@{model.boards[3]}"/>
+
+                <include
+                    layout="@layout/view_board_mini"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    app:layout_aspectRatio="100%"
+                    app:layout_marginPercent="1%"
+                    app:layout_widthPercent="32%"
+                    bind:availableInNextMove="@{model.nextBoardNumber == model.ALL_BOARDS || model.nextBoardNumber == 4}"
+                    bind:board="@{4}"
+                    bind:handler="@{handler}"
+                    bind:model="@{model.boards[4]}"/>
+
+                <include
+                    layout="@layout/view_board_mini"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    app:layout_aspectRatio="100%"
+                    app:layout_marginPercent="1%"
+                    app:layout_widthPercent="32%"
+                    bind:availableInNextMove="@{model.nextBoardNumber == model.ALL_BOARDS || model.nextBoardNumber == 5}"
+                    bind:board="@{5}"
+                    bind:handler="@{handler}"
+                    bind:model="@{model.boards[5]}"/>
+
+                <include
+                    layout="@layout/view_board_mini"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentStart="true"
+                    app:layout_aspectRatio="100%"
+                    app:layout_marginPercent="1%"
+                    app:layout_widthPercent="32%"
+                    bind:availableInNextMove="@{model.nextBoardNumber == model.ALL_BOARDS || model.nextBoardNumber == 6}"
+                    bind:board="@{6}"
+                    bind:handler="@{handler}"
+                    bind:model="@{model.boards[6]}"/>
+
+                <include
+                    layout="@layout/view_board_mini"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    app:layout_aspectRatio="100%"
+                    app:layout_marginPercent="1%"
+                    app:layout_widthPercent="32%"
+                    bind:availableInNextMove="@{model.nextBoardNumber == model.ALL_BOARDS || model.nextBoardNumber == 7}"
+                    bind:board="@{7}"
+                    bind:handler="@{handler}"
+                    bind:model="@{model.boards[7]}"/>
+
+                <include
+                    layout="@layout/view_board_mini"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    app:layout_aspectRatio="100%"
+                    app:layout_marginPercent="1%"
+                    app:layout_widthPercent="32%"
+                    bind:availableInNextMove="@{model.nextBoardNumber == model.ALL_BOARDS || model.nextBoardNumber == 8}"
+                    bind:board="@{8}"
+                    bind:handler="@{handler}"
+                    bind:model="@{model.boards[8]}"/>
+            </android.support.percent.PercentRelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@id/board"
+                android:orientation="vertical"
+                app:layout_marginEndPercent="1%"
+                app:layout_marginStartPercent="1%">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical|end">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/next_move"/>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@{model.currentMarker.icon}"
+                        tools:src="@drawable/ic_cross"/>
+                </LinearLayout>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{v -> handler.onClickClear()}"
+                    android:text="Proszę wyczyść planszę."/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{v -> handler.onClickGenerateRandom()}"
+                    android:text="Czy mógłbyś mi wylosowac jakis układ?"/>
+            </LinearLayout>
+        </android.support.percent.PercentRelativeLayout>
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="@{model.currentUser == null}"/>
+    </android.support.design.widget.CoordinatorLayout>
+</layout>

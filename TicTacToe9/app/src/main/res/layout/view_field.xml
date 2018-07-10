@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <data>
+
+        <variable
+            name="model"
+            type="FieldViewModel"/>
+
+        <variable
+            name="board"
+            type="java.lang.Integer"/>
+
+        <variable
+            name="field"
+            type="java.lang.Integer"/>
+
+        <variable
+            name="handler"
+            type="com.kutapps.tictactoe9.board.fragments.handlers.FieldHandler"/>
+
+        <import type="com.kutapps.tictactoe9.board.viewmodels.FieldViewModel"/>
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/field_background"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:onClick="@{v -> handler.onClickField(board, field)}"
+            android:padding="10dp"
+            android:src="@{model.marker.icon}"
+            tools:src="@drawable/ic_cross"/>
+    </LinearLayout>
+</layout>
